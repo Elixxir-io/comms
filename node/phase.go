@@ -29,19 +29,30 @@ func (s *Comms) SendPostPhase(host *connect.Host,
 	message *pb.Batch) (*messages.Ack, error) {
 
 	// Create the Send Function
-	f := func(conn *grpc.ClientConn) (*any.Any, error) {
+	f := func(conn connect.Connection) (*any.Any, error) {
 		// Set up the context
 		ctx, cancel := host.GetMessagingContext()
 		defer cancel()
-		//Format to authenticated message type
+		// Format to authenticated message type
 		authMsg, err := s.PackAuthenticatedMessage(message, host, false)
 		if err != nil {
 			return nil, errors.New(err.Error())
 		}
 		// Send the message
-		resultMsg, err := pb.NewNodeClient(conn).PostPhase(ctx, authMsg)
-		if err != nil {
-			return nil, errors.New(err.Error())
+		var resultMsg *messages.Ack
+		if conn.IsWeb() {
+			wc := conn.GetWebConn()
+			err = wc.Invoke(
+				ctx, "/mixmessages.Node/PostPhase", authMsg, resultMsg)
+			if err != nil {
+				return nil, err
+			}
+		} else {
+			resultMsg, err = pb.NewNodeClient(conn.GetGrpcConn()).
+				PostPhase(ctx, authMsg)
+			if err != nil {
+				return nil, errors.New(err.Error())
+			}
 		}
 		return ptypes.MarshalAny(resultMsg)
 	}

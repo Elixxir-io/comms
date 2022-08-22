@@ -16,7 +16,6 @@ import (
 	jww "github.com/spf13/jwalterweatherman"
 	pb "gitlab.com/elixxir/comms/mixmessages"
 	"gitlab.com/xx_network/comms/connect"
-	"google.golang.org/grpc"
 	"google.golang.org/grpc/metadata"
 	"io"
 )
@@ -97,7 +96,7 @@ func (g *Comms) getUnmixedBatchStream(host *connect.Host,
 	ctx context.Context) (pb.Node_UploadUnmixedBatchClient, error) {
 
 	// Create the Stream Function
-	f := func(conn *grpc.ClientConn) (interface{}, error) {
+	f := func(conn connect.Connection) (interface{}, error) {
 
 		// Add authentication information to streaming context
 		ctx = g.PackAuthenticatedContext(host, ctx)
@@ -131,7 +130,7 @@ func (g *Comms) DownloadMixedBatch(ready *pb.BatchReady,
 	ctx, cancel := connect.StreamingContext()
 	defer cancel()
 	f := func(conn *grpc.ClientConn) (interface{}, error) {
-		//Pack message into an authenticated message
+		// Pack message into an authenticated message
 		authMsg, err := g.PackAuthenticatedMessage(ready, host, false)
 		if err != nil {
 			return nil, errors.New(err.Error())

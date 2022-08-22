@@ -15,7 +15,6 @@ import (
 	pb "gitlab.com/elixxir/comms/mixmessages"
 	"gitlab.com/xx_network/comms/connect"
 	"gitlab.com/xx_network/comms/messages"
-	"google.golang.org/grpc"
 )
 
 // Server -> Registration Send Function
@@ -23,15 +22,27 @@ func (s *Comms) SendNodeRegistration(host *connect.Host,
 	message *pb.NodeRegistration) error {
 
 	// Create the Send Function
-	f := func(conn *grpc.ClientConn) (*any.Any, error) {
+	f := func(conn connect.Connection) (*any.Any, error) {
 		// Set up the context
 		ctx, cancel := host.GetMessagingContext()
 		defer cancel()
 
 		// Send the message
-		_, err := pb.NewRegistrationClient(conn).RegisterNode(ctx, message)
-		if err != nil {
-			err = errors.New(err.Error())
+		var resultMsg *messages.Ack
+		var err error
+		if conn.IsWeb() {
+			wc := conn.GetWebConn()
+			err = wc.Invoke(ctx, "/mixmessages.Registration/RegisterNode",
+				message, resultMsg)
+			if err != nil {
+				return nil, err
+			}
+		} else {
+			_, err = pb.NewRegistrationClient(conn.GetGrpcConn()).
+				RegisterNode(ctx, message)
+			if err != nil {
+				err = errors.New(err.Error())
+			}
 		}
 		return nil, err
 	}
@@ -47,20 +58,31 @@ func (s *Comms) SendPoll(host *connect.Host,
 	message *pb.PermissioningPoll) (*pb.PermissionPollResponse, error) {
 
 	// Create the Send Function
-	f := func(conn *grpc.ClientConn) (*any.Any, error) {
+	f := func(conn connect.Connection) (*any.Any, error) {
 		// Set up the context
 		ctx, cancel := host.GetMessagingContext()
 		defer cancel()
-		//Pack the message for server
+		// Pack the message for server
 		authMsg, err := s.PackAuthenticatedMessage(message, host, false)
 		if err != nil {
 			return nil, errors.New(err.Error())
 		}
 
 		// Send the message
-		resultMsg, err := pb.NewRegistrationClient(conn).Poll(ctx, authMsg)
-		if err != nil {
-			return nil, errors.New(err.Error())
+		var resultMsg *pb.PermissionPollResponse
+		if conn.IsWeb() {
+			wc := conn.GetWebConn()
+			err = wc.Invoke(
+				ctx, "/mixmessages.Registration/Poll", authMsg, resultMsg)
+			if err != nil {
+				return nil, err
+			}
+		} else {
+			resultMsg, err = pb.NewRegistrationClient(conn.GetGrpcConn()).
+				Poll(ctx, authMsg)
+			if err != nil {
+				return nil, errors.New(err.Error())
+			}
 		}
 		return ptypes.MarshalAny(resultMsg)
 	}
@@ -81,15 +103,27 @@ func (s *Comms) SendPoll(host *connect.Host,
 func (s *Comms) SendRegistrationCheck(host *connect.Host,
 	message *pb.RegisteredNodeCheck) (*pb.RegisteredNodeConfirmation, error) {
 	// Create the Send Function
-	f := func(conn *grpc.ClientConn) (*any.Any, error) {
+	f := func(conn connect.Connection) (*any.Any, error) {
 		// Set up the context
 		ctx, cancel := host.GetMessagingContext()
 		defer cancel()
 
 		// Send the message
-		resultMsg, err := pb.NewRegistrationClient(conn).CheckRegistration(ctx, message)
-		if err != nil {
-			return nil, errors.New(err.Error())
+		var resultMsg *pb.RegisteredNodeConfirmation
+		var err error
+		if conn.IsWeb() {
+			wc := conn.GetWebConn()
+			err = wc.Invoke(ctx, "/mixmessages.Registration/CheckRegistration",
+				message, resultMsg)
+			if err != nil {
+				return nil, err
+			}
+		} else {
+			resultMsg, err = pb.NewRegistrationClient(conn.GetGrpcConn()).
+				CheckRegistration(ctx, message)
+			if err != nil {
+				return nil, errors.New(err.Error())
+			}
 		}
 		return ptypes.MarshalAny(resultMsg)
 
@@ -111,15 +145,27 @@ func (s *Comms) SendRegistrationCheck(host *connect.Host,
 func (s *Comms) SendAuthorizerAuth(host *connect.Host,
 	message *pb.AuthorizerAuth) (*messages.Ack, error) {
 	// Create the Send Function
-	f := func(conn *grpc.ClientConn) (*any.Any, error) {
+	f := func(conn connect.Connection) (*any.Any, error) {
 		// Set up the context
 		ctx, cancel := host.GetMessagingContext()
 		defer cancel()
 
 		// Send the message
-		resultMsg, err := pb.NewAuthorizerClient(conn).Authorize(ctx, message)
-		if err != nil {
-			return nil, errors.New(err.Error())
+		var resultMsg *messages.Ack
+		var err error
+		if conn.IsWeb() {
+			wc := conn.GetWebConn()
+			err = wc.Invoke(
+				ctx, "/mixmessages.Authorizer/Authorize", message, resultMsg)
+			if err != nil {
+				return nil, err
+			}
+		} else {
+			resultMsg, err = pb.NewAuthorizerClient(conn.GetGrpcConn()).
+				Authorize(ctx, message)
+			if err != nil {
+				return nil, errors.New(err.Error())
+			}
 		}
 		return ptypes.MarshalAny(resultMsg)
 

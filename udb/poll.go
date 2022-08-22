@@ -16,23 +16,35 @@ import (
 	jww "github.com/spf13/jwalterweatherman"
 	pb "gitlab.com/elixxir/comms/mixmessages"
 	"gitlab.com/xx_network/comms/connect"
-	"google.golang.org/grpc"
 )
 
 // RequestNdf is used by User Discovery to Request a NDF from permissioning
 func (u *Comms) RequestNdf(host *connect.Host) (*pb.NDF, error) {
 
 	// Create the Send Function
-	f := func(conn *grpc.ClientConn) (*any.Any, error) {
+	f := func(conn connect.Connection) (*any.Any, error) {
 		// Set up the context
 		ctx, cancel := host.GetMessagingContext()
 		defer cancel()
 
+		message := &pb.NDFHash{Hash: make([]byte, 0)}
+
 		// Send the message
-		resultMsg, err := pb.NewRegistrationClient(
-			conn).PollNdf(ctx, &pb.NDFHash{Hash: make([]byte, 0)})
-		if err != nil {
-			return nil, errors.New(err.Error())
+		var resultMsg *pb.NDF
+		var err error
+		if conn.IsWeb() {
+			wc := conn.GetWebConn()
+			err = wc.Invoke(
+				ctx, "/mixmessages.Registration/PollNdf", message, resultMsg)
+			if err != nil {
+				return nil, err
+			}
+		} else {
+			resultMsg, err = pb.NewRegistrationClient(conn.GetGrpcConn()).
+				PollNdf(ctx, message)
+			if err != nil {
+				return nil, errors.New(err.Error())
+			}
 		}
 		return ptypes.MarshalAny(resultMsg)
 	}

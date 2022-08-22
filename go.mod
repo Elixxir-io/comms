@@ -9,14 +9,14 @@ require (
 	github.com/spf13/jwalterweatherman v1.1.0
 	gitlab.com/elixxir/crypto v0.0.7-0.20220818194137-973a70947df4
 	gitlab.com/elixxir/primitives v0.0.3-0.20220810173935-592f34a88326
-	gitlab.com/xx_network/comms v0.0.4-0.20220819175524-890bb9c8e18a
+	gitlab.com/xx_network/comms v0.0.4-0.20220822184203-6bf171f54b2b
 	gitlab.com/xx_network/crypto v0.0.5-0.20220729193517-1e5e96f39f6e
 	gitlab.com/xx_network/primitives v0.0.4-0.20220712193914-aebd8544396e
 	gitlab.com/xx_network/ring v0.0.3-0.20220222211904-da613960ad93
 	golang.org/x/crypto v0.0.0-20220525230936-793ad666bf5e
 	golang.org/x/net v0.0.0-20211112202133-69e39bad7dc2
 	google.golang.org/grpc v1.38.0
-	google.golang.org/protobuf v1.27.1 // indirect
+	google.golang.org/protobuf v1.27.1
 )
 
 require github.com/ktr0731/grpc-web-go-client v0.2.8 // indirect

@@ -17,27 +17,37 @@ import (
 	pb "gitlab.com/elixxir/comms/mixmessages"
 	"gitlab.com/xx_network/comms/connect"
 	"gitlab.com/xx_network/comms/messages"
-	"google.golang.org/grpc"
 )
 
 // Server -> Server error function
 func (s *Comms) SendRoundError(host *connect.Host, message *pb.RoundError) (*messages.Ack, error) {
 	// Create the Send Function
-	f := func(conn *grpc.ClientConn) (*any.Any, error) {
+	f := func(conn connect.Connection) (*any.Any, error) {
 		// Set up the context
 		ctx, cancel := host.GetMessagingContext()
 		defer cancel()
 
-		//Format to authenticated message type
+		// Format to authenticated message type
 		authMsg, err := s.PackAuthenticatedMessage(message, host, false)
 		if err != nil {
 			return nil, errors.New(err.Error())
 		}
 
 		// Send the message
-		resultMsg, err := pb.NewNodeClient(conn).RoundError(ctx, authMsg)
-		if err != nil {
-			return nil, errors.New(err.Error())
+		var resultMsg *messages.Ack
+		if conn.IsWeb() {
+			wc := conn.GetWebConn()
+			err = wc.Invoke(
+				ctx, "/mixmessages.Node/RoundError", authMsg, resultMsg)
+			if err != nil {
+				return nil, err
+			}
+		} else {
+			resultMsg, err = pb.NewNodeClient(conn.GetGrpcConn()).
+				RoundError(ctx, authMsg)
+			if err != nil {
+				return nil, errors.New(err.Error())
+			}
 		}
 		return ptypes.MarshalAny(resultMsg)
 	}
@@ -58,19 +68,30 @@ func (s *Comms) SendGetMeasure(host *connect.Host,
 	message *pb.RoundInfo) (*pb.RoundMetrics, error) {
 
 	// Create the Send Function
-	f := func(conn *grpc.ClientConn) (*any.Any, error) {
+	f := func(conn connect.Connection) (*any.Any, error) {
 		// Set up the context
 		ctx, cancel := host.GetMessagingContext()
 		defer cancel()
-		//Format to authenticated message type
+		// Format to authenticated message type
 		authMsg, err := s.PackAuthenticatedMessage(message, host, false)
 		if err != nil {
 			return nil, errors.New(err.Error())
 		}
 		// Send the message
-		resultMsg, err := pb.NewNodeClient(conn).GetMeasure(ctx, authMsg)
-		if err != nil {
-			return nil, errors.New(err.Error())
+		var resultMsg *pb.RoundMetrics
+		if conn.IsWeb() {
+			wc := conn.GetWebConn()
+			err = wc.Invoke(
+				ctx, "/mixmessages.Node/GetMeasure", authMsg, resultMsg)
+			if err != nil {
+				return nil, err
+			}
+		} else {
+			resultMsg, err = pb.NewNodeClient(conn.GetGrpcConn()).
+				GetMeasure(ctx, authMsg)
+			if err != nil {
+				return nil, errors.New(err.Error())
+			}
 		}
 		return ptypes.MarshalAny(resultMsg)
 	}
@@ -91,7 +112,7 @@ func (s *Comms) SendGetMeasure(host *connect.Host,
 func (s *Comms) SendAskOnline(host *connect.Host) (*messages.Ack, error) {
 
 	// Create the Send Function
-	f := func(conn *grpc.ClientConn) (*any.Any, error) {
+	f := func(conn connect.Connection) (*any.Any, error) {
 		// Set up the context
 		ctx, cancel := host.GetMessagingContext()
 		defer cancel()
@@ -102,9 +123,20 @@ func (s *Comms) SendAskOnline(host *connect.Host) (*messages.Ack, error) {
 		}
 
 		// Send the message
-		resultMsg, err := pb.NewNodeClient(conn).AskOnline(ctx, authMsg)
-		if err != nil {
-			return nil, errors.New(err.Error())
+		var resultMsg *messages.Ack
+		if conn.IsWeb() {
+			wc := conn.GetWebConn()
+			err = wc.Invoke(
+				ctx, "/mixmessages.Node/AskOnline", authMsg, resultMsg)
+			if err != nil {
+				return nil, err
+			}
+		} else {
+			resultMsg, err = pb.NewNodeClient(conn.GetGrpcConn()).
+				AskOnline(ctx, authMsg)
+			if err != nil {
+				return nil, errors.New(err.Error())
+			}
 		}
 		return ptypes.MarshalAny(resultMsg)
 	}
@@ -126,20 +158,31 @@ func (s *Comms) SendNewRound(host *connect.Host,
 	message *pb.RoundInfo) (*messages.Ack, error) {
 
 	// Create the Send Function
-	f := func(conn *grpc.ClientConn) (*any.Any, error) {
+	f := func(conn connect.Connection) (*any.Any, error) {
 		// Set up the context
 		ctx, cancel := host.GetMessagingContext()
 		defer cancel()
-		//Format to authenticated message type
+		// Format to authenticated message type
 		authMsg, err := s.PackAuthenticatedMessage(message, host, false)
 		if err != nil {
 			return nil, errors.New(err.Error())
 		}
 
 		// Send the message
-		resultMsg, err := pb.NewNodeClient(conn).CreateNewRound(ctx, authMsg)
-		if err != nil {
-			return nil, errors.New(err.Error())
+		var resultMsg *messages.Ack
+		if conn.IsWeb() {
+			wc := conn.GetWebConn()
+			err = wc.Invoke(
+				ctx, "/mixmessages.Node/CreateNewRound", authMsg, resultMsg)
+			if err != nil {
+				return nil, err
+			}
+		} else {
+			resultMsg, err = pb.NewNodeClient(conn.GetGrpcConn()).
+				CreateNewRound(ctx, authMsg)
+			if err != nil {
+				return nil, errors.New(err.Error())
+			}
 		}
 		return ptypes.MarshalAny(resultMsg)
 	}
@@ -161,12 +204,12 @@ func (s *Comms) SendPostPrecompResult(host *connect.Host,
 	roundID uint64, numSlots uint32) (*messages.Ack, error) {
 
 	// Create the Send Function
-	f := func(conn *grpc.ClientConn) (*any.Any, error) {
+	f := func(conn connect.Connection) (*any.Any, error) {
 		// Set up the context
 		ctx, cancel := host.GetMessagingContext()
 		defer cancel()
 
-		//Pack the message as an authenticated message
+		// Pack the message as an authenticated message
 		batchMsg := &pb.PostPrecompResult{
 			RoundId:  roundID,
 			NumSlots: numSlots,
@@ -177,10 +220,20 @@ func (s *Comms) SendPostPrecompResult(host *connect.Host,
 		}
 
 		// Send the message
-		resultMsg, err := pb.NewNodeClient(conn).PostPrecompResult(ctx,
-			authMsg)
-		if err != nil {
-			return nil, errors.New(err.Error())
+		var resultMsg *messages.Ack
+		if conn.IsWeb() {
+			wc := conn.GetWebConn()
+			err = wc.Invoke(
+				ctx, "/mixmessages.Node/PostPrecompResult", authMsg, resultMsg)
+			if err != nil {
+				return nil, err
+			}
+		} else {
+			resultMsg, err = pb.NewNodeClient(conn.GetGrpcConn()).
+				PostPrecompResult(ctx, authMsg)
+			if err != nil {
+				return nil, errors.New(err.Error())
+			}
 		}
 		return ptypes.MarshalAny(resultMsg)
 	}
@@ -202,22 +255,32 @@ func (s *Comms) SendPostPrecompResult(host *connect.Host,
 func (s *Comms) RoundTripPing(host *connect.Host, rtPing *pb.RoundTripPing) (*messages.Ack, error) {
 
 	// Create the Send Function
-	f := func(conn *grpc.ClientConn) (*any.Any, error) {
+	f := func(conn connect.Connection) (*any.Any, error) {
 		// Set up the context
 		ctx, cancel := host.GetMessagingContext()
 		defer cancel()
 
-		//Pack the message as an authenticated message
+		// Pack the message as an authenticated message
 		authMsg, err := s.PackAuthenticatedMessage(rtPing, host, false)
 		if err != nil {
 			return nil, errors.New(err.Error())
 		}
 
 		// Send the message
-		resultMsg, err := pb.NewNodeClient(conn).SendRoundTripPing(ctx,
-			authMsg)
-		if err != nil {
-			return nil, errors.New(err.Error())
+		var resultMsg *messages.Ack
+		if conn.IsWeb() {
+			wc := conn.GetWebConn()
+			err = wc.Invoke(
+				ctx, "/mixmessages.Node/SendRoundTripPing", authMsg, resultMsg)
+			if err != nil {
+				return nil, err
+			}
+		} else {
+			resultMsg, err = pb.NewNodeClient(conn.GetGrpcConn()).
+				SendRoundTripPing(ctx, authMsg)
+			if err != nil {
+				return nil, errors.New(err.Error())
+			}
 		}
 		return ptypes.MarshalAny(resultMsg)
 	}
@@ -238,22 +301,32 @@ func (s *Comms) RoundTripPing(host *connect.Host, rtPing *pb.RoundTripPing) (*me
 // Server -> Server initiating multi-party round DH key generation
 func (s *Comms) SendStartSharePhase(host *connect.Host, ri *pb.RoundInfo) (*messages.Ack, error) {
 	// Create the Send Function
-	f := func(conn *grpc.ClientConn) (*any.Any, error) {
+	f := func(conn connect.Connection) (*any.Any, error) {
 		// Set up the context
 		ctx, cancel := host.GetMessagingContext()
 		defer cancel()
 
-		//Pack the message as an authenticated message
+		// Pack the message as an authenticated message
 		authMsg, err := s.PackAuthenticatedMessage(ri, host, false)
 		if err != nil {
 			return nil, errors.New(err.Error())
 		}
 
 		// Send the message
-		resultMsg, err := pb.NewNodeClient(conn).StartSharePhase(ctx,
-			authMsg)
-		if err != nil {
-			return nil, errors.New(err.Error())
+		var resultMsg *messages.Ack
+		if conn.IsWeb() {
+			wc := conn.GetWebConn()
+			err = wc.Invoke(
+				ctx, "/mixmessages.Node/StartSharePhase", authMsg, resultMsg)
+			if err != nil {
+				return nil, err
+			}
+		} else {
+			resultMsg, err = pb.NewNodeClient(conn.GetGrpcConn()).
+				StartSharePhase(ctx, authMsg)
+			if err != nil {
+				return nil, errors.New(err.Error())
+			}
 		}
 		return ptypes.MarshalAny(resultMsg)
 	}
@@ -275,22 +348,32 @@ func (s *Comms) SendStartSharePhase(host *connect.Host, ri *pb.RoundInfo) (*mess
 // Server -> Server sending multi-party round DH key piece
 func (s *Comms) SendSharePhase(host *connect.Host, sharedPiece *pb.SharePiece) (*messages.Ack, error) {
 	// Create the Send Function
-	f := func(conn *grpc.ClientConn) (*any.Any, error) {
+	f := func(conn connect.Connection) (*any.Any, error) {
 		// Set up the context
 		ctx, cancel := host.GetMessagingContext()
 		defer cancel()
 
-		//Pack the message as an authenticated message
+		// Pack the message as an authenticated message
 		authMsg, err := s.PackAuthenticatedMessage(sharedPiece, host, false)
 		if err != nil {
 			return nil, errors.New(err.Error())
 		}
 
 		// Send the message
-		resultMsg, err := pb.NewNodeClient(conn).SharePhaseRound(ctx,
-			authMsg)
-		if err != nil {
-			return nil, errors.New(err.Error())
+		var resultMsg *messages.Ack
+		if conn.IsWeb() {
+			wc := conn.GetWebConn()
+			err = wc.Invoke(
+				ctx, "/mixmessages.Node/SharePhaseRound", authMsg, resultMsg)
+			if err != nil {
+				return nil, err
+			}
+		} else {
+			resultMsg, err = pb.NewNodeClient(conn.GetGrpcConn()).
+				SharePhaseRound(ctx, authMsg)
+			if err != nil {
+				return nil, errors.New(err.Error())
+			}
 		}
 		return ptypes.MarshalAny(resultMsg)
 	}
@@ -312,22 +395,32 @@ func (s *Comms) SendSharePhase(host *connect.Host, sharedPiece *pb.SharePiece) (
 // Server -> Server sending multi-party round DH final key
 func (s *Comms) SendFinalKey(host *connect.Host, sharedPiece *pb.SharePiece) (*messages.Ack, error) {
 	// Create the Send Function
-	f := func(conn *grpc.ClientConn) (*any.Any, error) {
+	f := func(conn connect.Connection) (*any.Any, error) {
 		// Set up the context
 		ctx, cancel := host.GetMessagingContext()
 		defer cancel()
 
-		//Pack the message as an authenticated message
+		// Pack the message as an authenticated message
 		authMsg, err := s.PackAuthenticatedMessage(sharedPiece, host, false)
 		if err != nil {
 			return nil, errors.New(err.Error())
 		}
 
 		// Send the message
-		resultMsg, err := pb.NewNodeClient(conn).ShareFinalKey(ctx,
-			authMsg)
-		if err != nil {
-			return nil, errors.New(err.Error())
+		var resultMsg *messages.Ack
+		if conn.IsWeb() {
+			wc := conn.GetWebConn()
+			err = wc.Invoke(
+				ctx, "/mixmessages.Node/ShareFinalKey", authMsg, resultMsg)
+			if err != nil {
+				return nil, err
+			}
+		} else {
+			resultMsg, err = pb.NewNodeClient(conn.GetGrpcConn()).
+				ShareFinalKey(ctx, authMsg)
+			if err != nil {
+				return nil, errors.New(err.Error())
+			}
 		}
 		return ptypes.MarshalAny(resultMsg)
 	}
