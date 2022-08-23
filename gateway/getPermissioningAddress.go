@@ -21,21 +21,10 @@ func (g *Comms) SendGetPermissioningAddress(host *connect.Host) (string, error) 
 		defer cancel()
 
 		// Send the message
-		var resultMsg *pb.StrAddress
-		var err error
-		if conn.IsWeb() {
-			wc := conn.GetWebConn()
-			err = wc.Invoke(ctx, "/mixmessages.Node/GetPermissioningAddress",
-				&messages.Ping{}, resultMsg)
-			if err != nil {
-				return nil, err
-			}
-		} else {
-			resultMsg, err = pb.NewNodeClient(conn.GetGrpcConn()).
-				GetPermissioningAddress(ctx, &messages.Ping{})
-			if err != nil {
-				return nil, errors.New(err.Error())
-			}
+		resultMsg, err := pb.NewNodeClient(conn.GetGrpcConn()).
+			GetPermissioningAddress(ctx, &messages.Ping{})
+		if err != nil {
+			return nil, errors.New(err.Error())
 		}
 		return ptypes.MarshalAny(resultMsg)
 	}

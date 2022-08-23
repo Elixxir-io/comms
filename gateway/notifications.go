@@ -24,16 +24,8 @@ func (g *Comms) SendNotificationBatch(host *connect.Host, notifBatch *pb.Notific
 		}
 
 		// Send the message
-		var resultMsg *pb.RoundBufferInfo
-		if conn.IsWeb() {
-			wc := conn.GetWebConn()
-			err = wc.Invoke(ctx,
-				"/mixmessages.NotificationBot/ReceiveNotificationBatch",
-				authMsg, resultMsg)
-		} else {
-			_, err = pb.NewNotificationBotClient(conn.GetGrpcConn()).
-				ReceiveNotificationBatch(ctx, authMsg)
-		}
+		_, err = pb.NewNotificationBotClient(conn.GetGrpcConn()).
+			ReceiveNotificationBatch(ctx, authMsg)
 		return nil, err
 	}
 

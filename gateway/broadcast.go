@@ -36,20 +36,10 @@ func (g *Comms) GetRoundBufferInfo(host *connect.Host) (*pb.RoundBufferInfo, err
 			return nil, errors.New(err.Error())
 		}
 		// Send the message
-		var resultMsg *pb.RoundBufferInfo
-		if conn.IsWeb() {
-			wc := conn.GetWebConn()
-			err = wc.Invoke(
-				ctx, "/mixmessages.Node/GetRoundBufferInfo", authMsg, resultMsg)
-			if err != nil {
-				return nil, err
-			}
-		} else {
-			resultMsg, err = pb.NewNodeClient(conn.GetGrpcConn()).
-				GetRoundBufferInfo(ctx, authMsg)
-			if err != nil {
-				return nil, errors.New(err.Error())
-			}
+		resultMsg, err := pb.NewNodeClient(conn.GetGrpcConn()).
+			GetRoundBufferInfo(ctx, authMsg)
+		if err != nil {
+			return nil, errors.New(err.Error())
 		}
 		return ptypes.MarshalAny(resultMsg)
 	}

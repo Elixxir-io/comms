@@ -20,7 +20,6 @@ import (
 	pb "gitlab.com/elixxir/comms/mixmessages"
 	"gitlab.com/xx_network/comms/connect"
 	"gitlab.com/xx_network/comms/messages"
-	"google.golang.org/grpc"
 	"google.golang.org/grpc/metadata"
 )
 
@@ -39,20 +38,10 @@ func (s *Comms) SendPostPhase(host *connect.Host,
 			return nil, errors.New(err.Error())
 		}
 		// Send the message
-		var resultMsg *messages.Ack
-		if conn.IsWeb() {
-			wc := conn.GetWebConn()
-			err = wc.Invoke(
-				ctx, "/mixmessages.Node/PostPhase", authMsg, resultMsg)
-			if err != nil {
-				return nil, err
-			}
-		} else {
-			resultMsg, err = pb.NewNodeClient(conn.GetGrpcConn()).
-				PostPhase(ctx, authMsg)
-			if err != nil {
-				return nil, errors.New(err.Error())
-			}
+		resultMsg, err := pb.NewNodeClient(conn.GetGrpcConn()).
+			PostPhase(ctx, authMsg)
+		if err != nil {
+			return nil, errors.New(err.Error())
 		}
 		return ptypes.MarshalAny(resultMsg)
 	}
@@ -109,13 +98,14 @@ func (s *Comms) getPostPhaseStream(host *connect.Host,
 	ctx context.Context) (pb.Node_StreamPostPhaseClient, error) {
 
 	// Create the Stream Function
-	f := func(conn *grpc.ClientConn) (interface{}, error) {
+	f := func(conn connect.Connection) (interface{}, error) {
 
 		// Add authentication information to streaming context
 		ctx = s.PackAuthenticatedContext(host, ctx)
 
 		// Get the stream client
-		streamClient, err := pb.NewNodeClient(conn).StreamPostPhase(ctx)
+		streamClient, err := pb.NewNodeClient(conn.GetGrpcConn()).
+			StreamPostPhase(ctx)
 		if err != nil {
 			return nil, errors.New(err.Error())
 		}

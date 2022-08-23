@@ -117,7 +117,8 @@ func (s *Comms) getFinishRealtimeStream(host *connect.Host,
 		ctx = s.PackAuthenticatedContext(host, ctx)
 
 		// Get the stream client
-		streamClient, err := pb.NewNodeClient(conn).FinishRealtime(ctx)
+		streamClient, err := pb.NewNodeClient(conn.GetGrpcConn()).
+			FinishRealtime(ctx)
 		if err != nil {
 			return nil, errors.New(err.Error())
 		}

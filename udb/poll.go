@@ -27,24 +27,11 @@ func (u *Comms) RequestNdf(host *connect.Host) (*pb.NDF, error) {
 		ctx, cancel := host.GetMessagingContext()
 		defer cancel()
 
-		message := &pb.NDFHash{Hash: make([]byte, 0)}
-
 		// Send the message
-		var resultMsg *pb.NDF
-		var err error
-		if conn.IsWeb() {
-			wc := conn.GetWebConn()
-			err = wc.Invoke(
-				ctx, "/mixmessages.Registration/PollNdf", message, resultMsg)
-			if err != nil {
-				return nil, err
-			}
-		} else {
-			resultMsg, err = pb.NewRegistrationClient(conn.GetGrpcConn()).
-				PollNdf(ctx, message)
-			if err != nil {
-				return nil, errors.New(err.Error())
-			}
+		resultMsg, err := pb.NewRegistrationClient(conn.GetGrpcConn()).
+			PollNdf(ctx, &pb.NDFHash{Hash: make([]byte, 0)})
+		if err != nil {
+			return nil, errors.New(err.Error())
 		}
 		return ptypes.MarshalAny(resultMsg)
 	}

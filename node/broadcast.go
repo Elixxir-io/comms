@@ -34,20 +34,10 @@ func (s *Comms) SendRoundError(host *connect.Host, message *pb.RoundError) (*mes
 		}
 
 		// Send the message
-		var resultMsg *messages.Ack
-		if conn.IsWeb() {
-			wc := conn.GetWebConn()
-			err = wc.Invoke(
-				ctx, "/mixmessages.Node/RoundError", authMsg, resultMsg)
-			if err != nil {
-				return nil, err
-			}
-		} else {
-			resultMsg, err = pb.NewNodeClient(conn.GetGrpcConn()).
-				RoundError(ctx, authMsg)
-			if err != nil {
-				return nil, errors.New(err.Error())
-			}
+		resultMsg, err := pb.NewNodeClient(conn.GetGrpcConn()).
+			RoundError(ctx, authMsg)
+		if err != nil {
+			return nil, errors.New(err.Error())
 		}
 		return ptypes.MarshalAny(resultMsg)
 	}
@@ -78,20 +68,10 @@ func (s *Comms) SendGetMeasure(host *connect.Host,
 			return nil, errors.New(err.Error())
 		}
 		// Send the message
-		var resultMsg *pb.RoundMetrics
-		if conn.IsWeb() {
-			wc := conn.GetWebConn()
-			err = wc.Invoke(
-				ctx, "/mixmessages.Node/GetMeasure", authMsg, resultMsg)
-			if err != nil {
-				return nil, err
-			}
-		} else {
-			resultMsg, err = pb.NewNodeClient(conn.GetGrpcConn()).
-				GetMeasure(ctx, authMsg)
-			if err != nil {
-				return nil, errors.New(err.Error())
-			}
+		resultMsg, err := pb.NewNodeClient(conn.GetGrpcConn()).
+			GetMeasure(ctx, authMsg)
+		if err != nil {
+			return nil, errors.New(err.Error())
 		}
 		return ptypes.MarshalAny(resultMsg)
 	}
@@ -123,20 +103,10 @@ func (s *Comms) SendAskOnline(host *connect.Host) (*messages.Ack, error) {
 		}
 
 		// Send the message
-		var resultMsg *messages.Ack
-		if conn.IsWeb() {
-			wc := conn.GetWebConn()
-			err = wc.Invoke(
-				ctx, "/mixmessages.Node/AskOnline", authMsg, resultMsg)
-			if err != nil {
-				return nil, err
-			}
-		} else {
-			resultMsg, err = pb.NewNodeClient(conn.GetGrpcConn()).
-				AskOnline(ctx, authMsg)
-			if err != nil {
-				return nil, errors.New(err.Error())
-			}
+		resultMsg, err := pb.NewNodeClient(conn.GetGrpcConn()).
+			AskOnline(ctx, authMsg)
+		if err != nil {
+			return nil, errors.New(err.Error())
 		}
 		return ptypes.MarshalAny(resultMsg)
 	}
@@ -169,20 +139,10 @@ func (s *Comms) SendNewRound(host *connect.Host,
 		}
 
 		// Send the message
-		var resultMsg *messages.Ack
-		if conn.IsWeb() {
-			wc := conn.GetWebConn()
-			err = wc.Invoke(
-				ctx, "/mixmessages.Node/CreateNewRound", authMsg, resultMsg)
-			if err != nil {
-				return nil, err
-			}
-		} else {
-			resultMsg, err = pb.NewNodeClient(conn.GetGrpcConn()).
-				CreateNewRound(ctx, authMsg)
-			if err != nil {
-				return nil, errors.New(err.Error())
-			}
+		resultMsg, err := pb.NewNodeClient(conn.GetGrpcConn()).
+			CreateNewRound(ctx, authMsg)
+		if err != nil {
+			return nil, errors.New(err.Error())
 		}
 		return ptypes.MarshalAny(resultMsg)
 	}
@@ -220,20 +180,10 @@ func (s *Comms) SendPostPrecompResult(host *connect.Host,
 		}
 
 		// Send the message
-		var resultMsg *messages.Ack
-		if conn.IsWeb() {
-			wc := conn.GetWebConn()
-			err = wc.Invoke(
-				ctx, "/mixmessages.Node/PostPrecompResult", authMsg, resultMsg)
-			if err != nil {
-				return nil, err
-			}
-		} else {
-			resultMsg, err = pb.NewNodeClient(conn.GetGrpcConn()).
-				PostPrecompResult(ctx, authMsg)
-			if err != nil {
-				return nil, errors.New(err.Error())
-			}
+		resultMsg, err := pb.NewNodeClient(conn.GetGrpcConn()).
+			PostPrecompResult(ctx, authMsg)
+		if err != nil {
+			return nil, errors.New(err.Error())
 		}
 		return ptypes.MarshalAny(resultMsg)
 	}
@@ -267,20 +217,11 @@ func (s *Comms) RoundTripPing(host *connect.Host, rtPing *pb.RoundTripPing) (*me
 		}
 
 		// Send the message
-		var resultMsg *messages.Ack
-		if conn.IsWeb() {
-			wc := conn.GetWebConn()
-			err = wc.Invoke(
-				ctx, "/mixmessages.Node/SendRoundTripPing", authMsg, resultMsg)
-			if err != nil {
-				return nil, err
-			}
-		} else {
-			resultMsg, err = pb.NewNodeClient(conn.GetGrpcConn()).
-				SendRoundTripPing(ctx, authMsg)
-			if err != nil {
-				return nil, errors.New(err.Error())
-			}
+		resultMsg, err := pb.NewNodeClient(conn.GetGrpcConn()).
+			SendRoundTripPing(ctx,
+				authMsg)
+		if err != nil {
+			return nil, errors.New(err.Error())
 		}
 		return ptypes.MarshalAny(resultMsg)
 	}
@@ -313,20 +254,11 @@ func (s *Comms) SendStartSharePhase(host *connect.Host, ri *pb.RoundInfo) (*mess
 		}
 
 		// Send the message
-		var resultMsg *messages.Ack
-		if conn.IsWeb() {
-			wc := conn.GetWebConn()
-			err = wc.Invoke(
-				ctx, "/mixmessages.Node/StartSharePhase", authMsg, resultMsg)
-			if err != nil {
-				return nil, err
-			}
-		} else {
-			resultMsg, err = pb.NewNodeClient(conn.GetGrpcConn()).
-				StartSharePhase(ctx, authMsg)
-			if err != nil {
-				return nil, errors.New(err.Error())
-			}
+		resultMsg, err := pb.NewNodeClient(conn.GetGrpcConn()).
+			StartSharePhase(ctx,
+				authMsg)
+		if err != nil {
+			return nil, errors.New(err.Error())
 		}
 		return ptypes.MarshalAny(resultMsg)
 	}
@@ -360,20 +292,10 @@ func (s *Comms) SendSharePhase(host *connect.Host, sharedPiece *pb.SharePiece) (
 		}
 
 		// Send the message
-		var resultMsg *messages.Ack
-		if conn.IsWeb() {
-			wc := conn.GetWebConn()
-			err = wc.Invoke(
-				ctx, "/mixmessages.Node/SharePhaseRound", authMsg, resultMsg)
-			if err != nil {
-				return nil, err
-			}
-		} else {
-			resultMsg, err = pb.NewNodeClient(conn.GetGrpcConn()).
-				SharePhaseRound(ctx, authMsg)
-			if err != nil {
-				return nil, errors.New(err.Error())
-			}
+		resultMsg, err := pb.NewNodeClient(conn.GetGrpcConn()).
+			SharePhaseRound(ctx, authMsg)
+		if err != nil {
+			return nil, errors.New(err.Error())
 		}
 		return ptypes.MarshalAny(resultMsg)
 	}
@@ -407,20 +329,10 @@ func (s *Comms) SendFinalKey(host *connect.Host, sharedPiece *pb.SharePiece) (*m
 		}
 
 		// Send the message
-		var resultMsg *messages.Ack
-		if conn.IsWeb() {
-			wc := conn.GetWebConn()
-			err = wc.Invoke(
-				ctx, "/mixmessages.Node/ShareFinalKey", authMsg, resultMsg)
-			if err != nil {
-				return nil, err
-			}
-		} else {
-			resultMsg, err = pb.NewNodeClient(conn.GetGrpcConn()).
-				ShareFinalKey(ctx, authMsg)
-			if err != nil {
-				return nil, errors.New(err.Error())
-			}
+		resultMsg, err := pb.NewNodeClient(conn.GetGrpcConn()).
+			ShareFinalKey(ctx, authMsg)
+		if err != nil {
+			return nil, errors.New(err.Error())
 		}
 		return ptypes.MarshalAny(resultMsg)
 	}

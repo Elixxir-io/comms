@@ -33,20 +33,10 @@ func (g *Comms) SendRequestClientKeyMessage(host *connect.Host,
 			return nil, errors.New(err.Error())
 		}
 		// Send the message
-		var resultMsg *pb.SignedKeyResponse
-		if conn.IsWeb() {
-			wc := conn.GetWebConn()
-			err = wc.Invoke(
-				ctx, "/mixmessages.Node/RequestClientKey", authMsg, resultMsg)
-			if err != nil {
-				return nil, err
-			}
-		} else {
-			resultMsg, err = pb.NewNodeClient(conn.GetGrpcConn()).
-				RequestClientKey(ctx, authMsg)
-			if err != nil {
-				return nil, errors.New(err.Error())
-			}
+		resultMsg, err := pb.NewNodeClient(conn.GetGrpcConn()).
+			RequestClientKey(ctx, authMsg)
+		if err != nil {
+			return nil, errors.New(err.Error())
 		}
 
 		return ptypes.MarshalAny(resultMsg)
@@ -80,19 +70,10 @@ func (g *Comms) SendPoll(host *connect.Host,
 		}
 
 		// Send the message
-		var resultMsg *pb.ServerPollResponse
-		if conn.IsWeb() {
-			wc := conn.GetWebConn()
-			err = wc.Invoke(ctx, "/mixmessages.Node/Poll", authMsg, resultMsg)
-			if err != nil {
-				return nil, err
-			}
-		} else {
-			resultMsg, err = pb.NewNodeClient(conn.GetGrpcConn()).
-				Poll(ctx, authMsg)
-			if err != nil {
-				return nil, errors.New(err.Error())
-			}
+		resultMsg, err := pb.NewNodeClient(conn.GetGrpcConn()).
+			Poll(ctx, authMsg)
+		if err != nil {
+			return nil, errors.New(err.Error())
 		}
 		return ptypes.MarshalAny(resultMsg)
 	}

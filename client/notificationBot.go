@@ -29,22 +29,10 @@ func (c *Comms) RegisterForNotifications(host *connect.Host,
 		defer cancel()
 
 		// Send the message
-		var resultMsg *messages.Ack
-		var err error
-		if conn.IsWeb() {
-			wc := conn.GetWebConn()
-			err = wc.Invoke(ctx,
-				"/mixmessages.NotificationBot/RegisterForNotifications",
-				message, resultMsg)
-			if err != nil {
-				return nil, err
-			}
-		} else {
-			resultMsg, err = pb.NewNotificationBotClient(conn.GetGrpcConn()).
-				RegisterForNotifications(ctx, message)
-			if err != nil {
-				return nil, errors.New(err.Error())
-			}
+		resultMsg, err := pb.NewNotificationBotClient(conn.GetGrpcConn()).
+			RegisterForNotifications(ctx, message)
+		if err != nil {
+			return nil, errors.New(err.Error())
 		}
 		return ptypes.MarshalAny(resultMsg)
 	}
@@ -71,22 +59,10 @@ func (c *Comms) UnregisterForNotifications(host *connect.Host, message *pb.Notif
 		defer cancel()
 
 		// Send the message
-		var resultMsg *messages.Ack
-		var err error
-		if conn.IsWeb() {
-			wc := conn.GetWebConn()
-			err = wc.Invoke(ctx,
-				"/mixmessages.NotificationBot/UnregisterForNotifications",
-				message, resultMsg)
-			if err != nil {
-				return nil, err
-			}
-		} else {
-			resultMsg, err = pb.NewNotificationBotClient(conn.GetGrpcConn()).
-				UnregisterForNotifications(ctx, message)
-			if err != nil {
-				return nil, errors.New(err.Error())
-			}
+		resultMsg, err := pb.NewNotificationBotClient(conn.GetGrpcConn()).
+			UnregisterForNotifications(ctx, message)
+		if err != nil {
+			return nil, errors.New(err.Error())
 		}
 		return ptypes.MarshalAny(resultMsg)
 	}

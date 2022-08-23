@@ -102,7 +102,8 @@ func (g *Comms) getUnmixedBatchStream(host *connect.Host,
 		ctx = g.PackAuthenticatedContext(host, ctx)
 
 		// Get the stream client
-		streamClient, err := pb.NewNodeClient(conn).UploadUnmixedBatch(ctx)
+		streamClient, err := pb.NewNodeClient(conn.GetGrpcConn()).
+			UploadUnmixedBatch(ctx)
 		if err != nil {
 			return nil, errors.New(err.Error())
 		}
@@ -129,15 +130,15 @@ func (g *Comms) DownloadMixedBatch(ready *pb.BatchReady,
 	// Create the Stream Function
 	ctx, cancel := connect.StreamingContext()
 	defer cancel()
-	f := func(conn *grpc.ClientConn) (interface{}, error) {
+	f := func(conn connect.Connection) (interface{}, error) {
 		// Pack message into an authenticated message
 		authMsg, err := g.PackAuthenticatedMessage(ready, host, false)
 		if err != nil {
 			return nil, errors.New(err.Error())
 		}
 		// Send the message
-		clientStream, err := pb.NewNodeClient(conn).DownloadMixedBatch(ctx,
-			authMsg)
+		clientStream, err := pb.NewNodeClient(conn.GetGrpcConn()).
+			DownloadMixedBatch(ctx, authMsg)
 		if err != nil {
 			return nil, errors.New(err.Error())
 		}

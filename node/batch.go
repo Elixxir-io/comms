@@ -114,7 +114,8 @@ func (s *Comms) getPrecompTestBatchStream(host *connect.Host,
 		ctx = s.PackAuthenticatedContext(host, ctx)
 
 		// Get the stream client
-		streamClient, err := pb.NewNodeClient(conn).PrecompTestBatch(ctx)
+		streamClient, err := pb.NewNodeClient(conn.GetGrpcConn()).
+			PrecompTestBatch(ctx)
 		if err != nil {
 			return nil, errors.New(err.Error())
 		}

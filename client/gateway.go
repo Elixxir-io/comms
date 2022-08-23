@@ -162,13 +162,29 @@ func (c *Comms) SendPoll(host *connect.Host,
 	defer cancel()
 
 	// Create the Stream Function
-	f := func(conn *grpc.ClientConn) (interface{}, error) {
+	f := func(conn connect.Connection) (interface{}, error) {
 		// Send the message
-		clientStream, err := pb.NewGatewayClient(conn).Poll(ctx, message)
-		if err != nil {
-			return nil, errors.New(err.Error())
+		if conn.IsWeb() {
+			wc := conn.GetWebConn()
+			clientStream, err := wc.NewClientStream(
+				&grpc.StreamDesc{ClientStreams: true},
+				"/mixmessages.Gateway/Poll")
+			if err != nil {
+				return nil, err
+			}
+			err = clientStream.Send(ctx, message)
+			if err != nil {
+				return nil, err
+			}
+			return clientStream, nil
+		} else {
+			clientStream, err := pb.NewGatewayClient(conn.GetGrpcConn()).
+				Poll(ctx, message)
+			if err != nil {
+				return nil, errors.New(err.Error())
+			}
+			return clientStream, nil
 		}
-		return clientStream, nil
 	}
 
 	// Execute the Send function

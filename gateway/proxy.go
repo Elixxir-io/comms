@@ -30,21 +30,10 @@ func (g *Comms) SendRequestClientKey(host *connect.Host,
 		defer cancel()
 
 		// Send the message
-		var resultMsg *pb.SignedKeyResponse
-		var err error
-		if conn.IsWeb() {
-			wc := conn.GetWebConn()
-			err = wc.Invoke(ctx, "/mixmessages.Gateway/RequestClientKey",
-				messages, resultMsg)
-			if err != nil {
-				return nil, err
-			}
-		} else {
-			resultMsg, err = pb.NewGatewayClient(conn.GetGrpcConn()).
-				RequestClientKey(ctx, messages)
-			if err != nil {
-				return nil, err
-			}
+		resultMsg, err := pb.NewGatewayClient(conn.GetGrpcConn()).
+			RequestClientKey(ctx, messages)
+		if err != nil {
+			return nil, err
 		}
 
 		return ptypes.MarshalAny(resultMsg)
@@ -82,20 +71,10 @@ func (g *Comms) SendPutMessageProxy(host *connect.Host, messages *pb.GatewaySlot
 		}
 
 		// Send the message
-		var resultMsg *pb.GatewaySlotResponse
-		if conn.IsWeb() {
-			wc := conn.GetWebConn()
-			err = wc.Invoke(ctx, "/mixmessages.Gateway/PutMessageProxy",
-				authMsg, resultMsg)
-			if err != nil {
-				return nil, err
-			}
-		} else {
-			resultMsg, err = pb.NewGatewayClient(conn.GetGrpcConn()).
-				PutMessageProxy(ctx, authMsg)
-			if err != nil {
-				return nil, err
-			}
+		resultMsg, err := pb.NewGatewayClient(conn.GetGrpcConn()).
+			PutMessageProxy(ctx, authMsg)
+		if err != nil {
+			return nil, err
 		}
 
 		return ptypes.MarshalAny(resultMsg)
@@ -133,20 +112,10 @@ func (g *Comms) SendPutManyMessagesProxy(host *connect.Host, messages *pb.Gatewa
 		}
 
 		// Send the message
-		var resultMsg *pb.GatewaySlotResponse
-		if conn.IsWeb() {
-			wc := conn.GetWebConn()
-			err = wc.Invoke(ctx, "/mixmessages.Gateway/PutManyMessagesProxy",
-				authMsg, resultMsg)
-			if err != nil {
-				return nil, err
-			}
-		} else {
-			resultMsg, err = pb.NewGatewayClient(conn.GetGrpcConn()).
-				PutManyMessagesProxy(ctx, authMsg)
-			if err != nil {
-				return nil, err
-			}
+		resultMsg, err := pb.NewGatewayClient(conn.GetGrpcConn()).
+			PutManyMessagesProxy(ctx, authMsg)
+		if err != nil {
+			return nil, err
 		}
 
 		return ptypes.MarshalAny(resultMsg)
@@ -176,21 +145,10 @@ func (g *Comms) SendRequestMessages(host *connect.Host,
 		defer cancel()
 
 		// Send the message
-		var resultMsg *pb.GetMessagesResponse
-		var err error
-		if conn.IsWeb() {
-			wc := conn.GetWebConn()
-			err = wc.Invoke(ctx, "/mixmessages.Gateway/RequestMessages",
-				messages, resultMsg)
-			if err != nil {
-				return nil, err
-			}
-		} else {
-			resultMsg, err = pb.NewGatewayClient(conn.GetGrpcConn()).
-				RequestMessages(ctx, messages)
-			if err != nil {
-				return nil, err
-			}
+		resultMsg, err := pb.NewGatewayClient(conn.GetGrpcConn()).
+			RequestMessages(ctx, messages)
+		if err != nil {
+			return nil, err
 		}
 
 		return ptypes.MarshalAny(resultMsg)

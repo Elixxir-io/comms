@@ -30,21 +30,10 @@ func (nb *Comms) PollNdf(host *connect.Host, ndfHash []byte) (*pb.NDF, error) {
 		ndfRequest := &pb.NDFHash{Hash: ndfHash}
 
 		// Send the message
-		var resultMsg *pb.NDF
-		var err error
-		if conn.IsWeb() {
-			wc := conn.GetWebConn()
-			err = wc.Invoke(
-				ctx, "/mixmessages.Registration/PollNdf", ndfRequest, resultMsg)
-			if err != nil {
-				return nil, err
-			}
-		} else {
-			resultMsg, err = pb.NewRegistrationClient(conn.GetGrpcConn()).
-				PollNdf(ctx, ndfRequest)
-			if err != nil {
-				return nil, errors.New(err.Error())
-			}
+		resultMsg, err := pb.NewRegistrationClient(conn.GetGrpcConn()).
+			PollNdf(ctx, ndfRequest)
+		if err != nil {
+			return nil, errors.New(err.Error())
 		}
 		return ptypes.MarshalAny(resultMsg)
 	}

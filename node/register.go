@@ -28,21 +28,10 @@ func (s *Comms) SendNodeRegistration(host *connect.Host,
 		defer cancel()
 
 		// Send the message
-		var resultMsg *messages.Ack
-		var err error
-		if conn.IsWeb() {
-			wc := conn.GetWebConn()
-			err = wc.Invoke(ctx, "/mixmessages.Registration/RegisterNode",
-				message, resultMsg)
-			if err != nil {
-				return nil, err
-			}
-		} else {
-			_, err = pb.NewRegistrationClient(conn.GetGrpcConn()).
-				RegisterNode(ctx, message)
-			if err != nil {
-				err = errors.New(err.Error())
-			}
+		_, err := pb.NewRegistrationClient(conn.GetGrpcConn()).
+			RegisterNode(ctx, message)
+		if err != nil {
+			err = errors.New(err.Error())
 		}
 		return nil, err
 	}
@@ -69,20 +58,10 @@ func (s *Comms) SendPoll(host *connect.Host,
 		}
 
 		// Send the message
-		var resultMsg *pb.PermissionPollResponse
-		if conn.IsWeb() {
-			wc := conn.GetWebConn()
-			err = wc.Invoke(
-				ctx, "/mixmessages.Registration/Poll", authMsg, resultMsg)
-			if err != nil {
-				return nil, err
-			}
-		} else {
-			resultMsg, err = pb.NewRegistrationClient(conn.GetGrpcConn()).
-				Poll(ctx, authMsg)
-			if err != nil {
-				return nil, errors.New(err.Error())
-			}
+		resultMsg, err := pb.NewRegistrationClient(conn.GetGrpcConn()).
+			Poll(ctx, authMsg)
+		if err != nil {
+			return nil, errors.New(err.Error())
 		}
 		return ptypes.MarshalAny(resultMsg)
 	}
@@ -109,21 +88,10 @@ func (s *Comms) SendRegistrationCheck(host *connect.Host,
 		defer cancel()
 
 		// Send the message
-		var resultMsg *pb.RegisteredNodeConfirmation
-		var err error
-		if conn.IsWeb() {
-			wc := conn.GetWebConn()
-			err = wc.Invoke(ctx, "/mixmessages.Registration/CheckRegistration",
-				message, resultMsg)
-			if err != nil {
-				return nil, err
-			}
-		} else {
-			resultMsg, err = pb.NewRegistrationClient(conn.GetGrpcConn()).
-				CheckRegistration(ctx, message)
-			if err != nil {
-				return nil, errors.New(err.Error())
-			}
+		resultMsg, err := pb.NewRegistrationClient(conn.GetGrpcConn()).
+			CheckRegistration(ctx, message)
+		if err != nil {
+			return nil, errors.New(err.Error())
 		}
 		return ptypes.MarshalAny(resultMsg)
 
@@ -151,21 +119,10 @@ func (s *Comms) SendAuthorizerAuth(host *connect.Host,
 		defer cancel()
 
 		// Send the message
-		var resultMsg *messages.Ack
-		var err error
-		if conn.IsWeb() {
-			wc := conn.GetWebConn()
-			err = wc.Invoke(
-				ctx, "/mixmessages.Authorizer/Authorize", message, resultMsg)
-			if err != nil {
-				return nil, err
-			}
-		} else {
-			resultMsg, err = pb.NewAuthorizerClient(conn.GetGrpcConn()).
-				Authorize(ctx, message)
-			if err != nil {
-				return nil, errors.New(err.Error())
-			}
+		resultMsg, err := pb.NewAuthorizerClient(conn.GetGrpcConn()).
+			Authorize(ctx, message)
+		if err != nil {
+			return nil, errors.New(err.Error())
 		}
 		return ptypes.MarshalAny(resultMsg)
 
