@@ -41,15 +41,12 @@ func (c *Comms) SendRegistrationMessage(host *connect.Host,
 			wc := conn.GetWebConn()
 			err = wc.Invoke(ctx, "/mixmessages.ClientRegistrar/RegisterUser",
 				message, resultMsg)
-			if err != nil {
-				return nil, err
-			}
 		} else {
 			resultMsg, err = pb.NewClientRegistrarClient(conn.GetGrpcConn()).
 				RegisterUser(ctx, message)
-			if err != nil {
-				return nil, errors.New(err.Error())
-			}
+		}
+		if err != nil {
+			return nil, errors.New(err.Error())
 		}
 		return ptypes.MarshalAny(resultMsg)
 	}
@@ -84,15 +81,12 @@ func (c *Comms) RequestNdf(host *connect.Host,
 			wc := conn.GetWebConn()
 			err = wc.Invoke(
 				ctx, "/mixmessages.Registration/PollNdf", message, resultMsg)
-			if err != nil {
-				return nil, err
-			}
 		} else {
 			resultMsg, err = pb.NewRegistrationClient(conn.GetGrpcConn()).
 				PollNdf(ctx, message)
-			if err != nil {
-				return nil, errors.New(err.Error())
-			}
+		}
+		if err != nil {
+			return nil, errors.New(err.Error())
 		}
 		return ptypes.MarshalAny(resultMsg)
 	}

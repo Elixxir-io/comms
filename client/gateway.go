@@ -39,17 +39,14 @@ func (c *Comms) SendPutMessage(host *connect.Host, message *pb.GatewaySlot,
 			wc := conn.GetWebConn()
 			err = wc.Invoke(
 				ctx, "/mixmessages.Gateway/PutMessage", message, resultMsg)
-			if err != nil {
-				return nil, err
-			}
 		} else {
 			resultMsg, err = pb.NewGatewayClient(conn.GetGrpcConn()).
 				PutMessage(ctx, message)
-			if err != nil {
-				err = errors.New(err.Error())
-				return nil, errors.New(err.Error())
+		}
 
-			}
+		if err != nil {
+			err = errors.New(err.Error())
+			return nil, errors.New(err.Error())
 		}
 		return ptypes.MarshalAny(resultMsg)
 	}
@@ -83,16 +80,13 @@ func (c *Comms) SendPutManyMessages(host *connect.Host,
 			wc := conn.GetWebConn()
 			err = wc.Invoke(ctx, "/mixmessages.Gateway/PutManyMessages",
 				messages, resultMsg)
-			if err != nil {
-				return nil, err
-			}
 		} else {
 			resultMsg, err = pb.NewGatewayClient(conn.GetGrpcConn()).
 				PutManyMessages(ctx, messages)
-			if err != nil {
-				err = errors.New(err.Error())
-				return nil, errors.New(err.Error())
-			}
+		}
+		if err != nil {
+			err = errors.New(err.Error())
+			return nil, errors.New(err.Error())
 		}
 		return ptypes.MarshalAny(resultMsg)
 	}
@@ -126,17 +120,14 @@ func (c *Comms) SendRequestClientKeyMessage(host *connect.Host,
 			wc := conn.GetWebConn()
 			err = wc.Invoke(ctx, "/mixmessages.Gateway/RequestClientKey",
 				message, resultMsg)
-			if err != nil {
-				return nil, err
-			}
 		} else {
 			resultMsg, err = pb.NewGatewayClient(conn.GetGrpcConn()).
 				RequestClientKey(ctx, message)
+		}
 
-			// Make sure there are no errors with sending the message
-			if err != nil {
-				return nil, errors.New(err.Error())
-			}
+		// Make sure there are no errors with sending the message
+		if err != nil {
+			return nil, errors.New(err.Error())
 		}
 		return ptypes.MarshalAny(resultMsg)
 	}
@@ -266,15 +257,12 @@ func (c *Comms) RequestHistoricalRounds(host *connect.Host,
 			wc := conn.GetWebConn()
 			err = wc.Invoke(ctx, "/mixmessages.Gateway/RequestHistoricalRounds",
 				message, resultMsg)
-			if err != nil {
-				return nil, err
-			}
 		} else {
 			resultMsg, err = pb.NewGatewayClient(conn.GetGrpcConn()).
 				RequestHistoricalRounds(ctx, message)
-			if err != nil {
-				return nil, errors.New(err.Error())
-			}
+		}
+		if err != nil {
+			return nil, errors.New(err.Error())
 		}
 		return ptypes.MarshalAny(resultMsg)
 	}
@@ -307,15 +295,12 @@ func (c *Comms) RequestMessages(host *connect.Host,
 			wc := conn.GetWebConn()
 			err = wc.Invoke(
 				ctx, "/mixmessages.Gateway/RequestMessages", message, resultMsg)
-			if err != nil {
-				return nil, err
-			}
 		} else {
 			resultMsg, err = pb.NewGatewayClient(conn.GetGrpcConn()).
 				RequestMessages(ctx, message)
-			if err != nil {
-				return nil, errors.New(err.Error())
-			}
+		}
+		if err != nil {
+			return nil, errors.New(err.Error())
 		}
 		return ptypes.MarshalAny(resultMsg)
 	}

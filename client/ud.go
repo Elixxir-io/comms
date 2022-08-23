@@ -25,17 +25,13 @@ func (c *Comms) SendRegisterUser(host *connect.Host, message *pb.UDBUserRegistra
 			wc := conn.GetWebConn()
 			err = wc.Invoke(
 				ctx, "/mixmessages.UDB/RegisterUser", message, resultMsg)
-			if err != nil {
-				return nil, err
-			}
 		} else {
 			resultMsg, err = pb.NewUDBClient(conn.GetGrpcConn()).
 				RegisterUser(ctx, message)
-			if err != nil {
-				err = errors.New(err.Error())
-				return nil, errors.New(err.Error())
-
-			}
+		}
+		if err != nil {
+			err = errors.New(err.Error())
+			return nil, errors.New(err.Error())
 		}
 		return ptypes.MarshalAny(resultMsg)
 	}
@@ -65,17 +61,13 @@ func (c *Comms) SendRegisterFact(host *connect.Host, message *pb.FactRegisterReq
 			wc := conn.GetWebConn()
 			err = wc.Invoke(
 				ctx, "/mixmessages.UDB/RegisterFact", message, resultMsg)
-			if err != nil {
-				return nil, err
-			}
 		} else {
 			resultMsg, err = pb.NewUDBClient(conn.GetGrpcConn()).
 				RegisterFact(ctx, message)
-			if err != nil {
-				err = errors.New(err.Error())
-				return nil, errors.New(err.Error())
-
-			}
+		}
+		if err != nil {
+			err = errors.New(err.Error())
+			return nil, errors.New(err.Error())
 		}
 		return ptypes.MarshalAny(resultMsg)
 	}
@@ -107,17 +99,13 @@ func (c *Comms) SendConfirmFact(host *connect.Host, message *pb.FactConfirmReque
 			wc := conn.GetWebConn()
 			err = wc.Invoke(
 				ctx, "/mixmessages.UDB/ConfirmFact", message, resultMsg)
-			if err != nil {
-				return nil, err
-			}
 		} else {
 			resultMsg, err = pb.NewUDBClient(conn.GetGrpcConn()).
 				ConfirmFact(ctx, message)
-			if err != nil {
-				err = errors.New(err.Error())
-				return nil, errors.New(err.Error())
-
-			}
+		}
+		if err != nil {
+			err = errors.New(err.Error())
+			return nil, errors.New(err.Error())
 		}
 		return ptypes.MarshalAny(resultMsg)
 	}
@@ -147,17 +135,13 @@ func (c *Comms) SendRemoveFact(host *connect.Host, message *pb.FactRemovalReques
 			wc := conn.GetWebConn()
 			err = wc.Invoke(
 				ctx, "/mixmessages.UDB/RemoveFact", message, resultMsg)
-			if err != nil {
-				return nil, err
-			}
 		} else {
 			resultMsg, err = pb.NewUDBClient(conn.GetGrpcConn()).
 				RemoveFact(ctx, message)
-			if err != nil {
-				err = errors.New(err.Error())
-				return nil, errors.New(err.Error())
-
-			}
+		}
+		if err != nil {
+			err = errors.New(err.Error())
+			return nil, errors.New(err.Error())
 		}
 		return ptypes.MarshalAny(resultMsg)
 	}
@@ -187,17 +171,13 @@ func (c *Comms) SendRemoveUser(host *connect.Host, message *pb.FactRemovalReques
 			wc := conn.GetWebConn()
 			err = wc.Invoke(
 				ctx, "/mixmessages.UDB/RemoveUser", message, resultMsg)
-			if err != nil {
-				return nil, err
-			}
 		} else {
 			resultMsg, err = pb.NewUDBClient(conn.GetGrpcConn()).
 				RemoveUser(ctx, message)
-			if err != nil {
-				err = errors.New(err.Error())
-				return nil, errors.New(err.Error())
-
-			}
+		}
+		if err != nil {
+			err = errors.New(err.Error())
+			return nil, errors.New(err.Error())
 		}
 		return ptypes.MarshalAny(resultMsg)
 	}
@@ -227,17 +207,13 @@ func (c *Comms) SendChannelAuthRequest(host *connect.Host, message *pb.ChannelLe
 			wc := conn.GetWebConn()
 			err = wc.Invoke(
 				ctx, "/mixmessages.UDB/RequestChannelLease", message, resultMsg)
-			if err != nil {
-				return nil, err
-			}
 		} else {
 			resultMsg, err = pb.NewUDBClient(conn.GetGrpcConn()).
 				RequestChannelLease(ctx, message)
-			if err != nil {
-				err = errors.New(err.Error())
-				return nil, errors.New(err.Error())
-
-			}
+		}
+		if err != nil {
+			err = errors.New(err.Error())
+			return nil, errors.New(err.Error())
 		}
 		return ptypes.MarshalAny(resultMsg)
 	}
