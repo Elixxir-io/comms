@@ -38,6 +38,18 @@ func GetGatewayKeyPath() string {
 }
 
 func LoadFromPath(path string) []byte {
+	// Check if the path is an embedded file
+	switch filepath.Base(path) {
+	case "cmix.rip.crt":
+		return CmixCrt
+	case "cmix.rip.key":
+		return CmixKey
+	case "gateway.cmix.rip.crt":
+		return GatewayCrt
+	case "gateway.cmix.rip.key":
+		return GatewayKey
+	}
+
 	data, err := utils.ReadFile(path)
 	if err != nil {
 		jww.FATAL.Panicf("***Check your key!***\nFailed to read file at %s: %+v", path, err)
