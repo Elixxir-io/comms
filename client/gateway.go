@@ -10,15 +10,12 @@
 package client
 
 import (
-	"fmt"
 	"github.com/golang/protobuf/ptypes"
 	"github.com/golang/protobuf/ptypes/any"
-	"github.com/ktr0731/grpc-web-go-client/grpcweb"
 	"github.com/pkg/errors"
 	jww "github.com/spf13/jwalterweatherman"
 	pb "gitlab.com/elixxir/comms/mixmessages"
 	"gitlab.com/xx_network/comms/connect"
-	"golang.org/x/net/context"
 	"google.golang.org/grpc"
 	"io"
 	"strconv"
@@ -168,7 +165,7 @@ func (c *Comms) SendPoll(host *connect.Host,
 			if err != nil {
 				return nil, err
 			}
-			return clientStream, nil
+			return newServerStream(ctx, clientStream), nil
 		} else {
 			clientStream, err := pb.NewGatewayClient(conn.GetGrpcConn()).
 				Poll(ctx, message)
