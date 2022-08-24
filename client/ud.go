@@ -3,7 +3,6 @@ package client
 import (
 	"github.com/golang/protobuf/ptypes"
 	"github.com/golang/protobuf/ptypes/any"
-	"github.com/pkg/errors"
 	jww "github.com/spf13/jwalterweatherman"
 	pb "gitlab.com/elixxir/comms/mixmessages"
 	"gitlab.com/xx_network/comms/connect"
@@ -19,7 +18,7 @@ func (c *Comms) SendRegisterUser(host *connect.Host, message *pb.UDBUserRegistra
 		defer cancel()
 
 		// Send the message
-		var resultMsg *messages.Ack
+		var resultMsg = &messages.Ack{}
 		var err error
 		if conn.IsWeb() {
 			wc := conn.GetWebConn()
@@ -30,8 +29,7 @@ func (c *Comms) SendRegisterUser(host *connect.Host, message *pb.UDBUserRegistra
 				RegisterUser(ctx, message)
 		}
 		if err != nil {
-			err = errors.New(err.Error())
-			return nil, errors.New(err.Error())
+			return nil, err
 		}
 		return ptypes.MarshalAny(resultMsg)
 	}
@@ -55,7 +53,7 @@ func (c *Comms) SendRegisterFact(host *connect.Host, message *pb.FactRegisterReq
 		defer cancel()
 
 		// Send the message
-		var resultMsg *pb.FactRegisterResponse
+		var resultMsg = &pb.FactRegisterResponse{}
 		var err error
 		if conn.IsWeb() {
 			wc := conn.GetWebConn()
@@ -66,8 +64,7 @@ func (c *Comms) SendRegisterFact(host *connect.Host, message *pb.FactRegisterReq
 				RegisterFact(ctx, message)
 		}
 		if err != nil {
-			err = errors.New(err.Error())
-			return nil, errors.New(err.Error())
+			return nil, err
 		}
 		return ptypes.MarshalAny(resultMsg)
 	}
@@ -93,7 +90,7 @@ func (c *Comms) SendConfirmFact(host *connect.Host, message *pb.FactConfirmReque
 		defer cancel()
 
 		// Send the message
-		var resultMsg *messages.Ack
+		var resultMsg = &messages.Ack{}
 		var err error
 		if conn.IsWeb() {
 			wc := conn.GetWebConn()
@@ -104,8 +101,7 @@ func (c *Comms) SendConfirmFact(host *connect.Host, message *pb.FactConfirmReque
 				ConfirmFact(ctx, message)
 		}
 		if err != nil {
-			err = errors.New(err.Error())
-			return nil, errors.New(err.Error())
+			return nil, err
 		}
 		return ptypes.MarshalAny(resultMsg)
 	}
@@ -129,7 +125,7 @@ func (c *Comms) SendRemoveFact(host *connect.Host, message *pb.FactRemovalReques
 		defer cancel()
 
 		// Send the message
-		var resultMsg *messages.Ack
+		var resultMsg = &messages.Ack{}
 		var err error
 		if conn.IsWeb() {
 			wc := conn.GetWebConn()
@@ -140,8 +136,7 @@ func (c *Comms) SendRemoveFact(host *connect.Host, message *pb.FactRemovalReques
 				RemoveFact(ctx, message)
 		}
 		if err != nil {
-			err = errors.New(err.Error())
-			return nil, errors.New(err.Error())
+			return nil, err
 		}
 		return ptypes.MarshalAny(resultMsg)
 	}
@@ -165,7 +160,7 @@ func (c *Comms) SendRemoveUser(host *connect.Host, message *pb.FactRemovalReques
 		defer cancel()
 
 		// Send the message
-		var resultMsg *messages.Ack
+		var resultMsg = &messages.Ack{}
 		var err error
 		if conn.IsWeb() {
 			wc := conn.GetWebConn()
@@ -176,8 +171,7 @@ func (c *Comms) SendRemoveUser(host *connect.Host, message *pb.FactRemovalReques
 				RemoveUser(ctx, message)
 		}
 		if err != nil {
-			err = errors.New(err.Error())
-			return nil, errors.New(err.Error())
+			return nil, err
 		}
 		return ptypes.MarshalAny(resultMsg)
 	}
@@ -201,7 +195,7 @@ func (c *Comms) SendChannelAuthRequest(host *connect.Host, message *pb.ChannelLe
 		defer cancel()
 
 		// Send the message
-		var resultMsg *pb.ChannelLeaseResponse
+		var resultMsg = &pb.ChannelLeaseResponse{}
 		var err error
 		if conn.IsWeb() {
 			wc := conn.GetWebConn()
@@ -212,8 +206,7 @@ func (c *Comms) SendChannelAuthRequest(host *connect.Host, message *pb.ChannelLe
 				RequestChannelLease(ctx, message)
 		}
 		if err != nil {
-			err = errors.New(err.Error())
-			return nil, errors.New(err.Error())
+			return nil, err
 		}
 		return ptypes.MarshalAny(resultMsg)
 	}

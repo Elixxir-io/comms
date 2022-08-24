@@ -10,12 +10,15 @@
 package client
 
 import (
+	"fmt"
 	"github.com/golang/protobuf/ptypes"
 	"github.com/golang/protobuf/ptypes/any"
+	"github.com/ktr0731/grpc-web-go-client/grpcweb"
 	"github.com/pkg/errors"
 	jww "github.com/spf13/jwalterweatherman"
 	pb "gitlab.com/elixxir/comms/mixmessages"
 	"gitlab.com/xx_network/comms/connect"
+	"golang.org/x/net/context"
 	"google.golang.org/grpc"
 	"io"
 	"strconv"
@@ -33,7 +36,7 @@ func (c *Comms) SendPutMessage(host *connect.Host, message *pb.GatewaySlot,
 		defer cancel()
 
 		// Send the message
-		var resultMsg *pb.GatewaySlotResponse
+		var resultMsg = &pb.GatewaySlotResponse{}
 		var err error
 		if conn.IsWeb() {
 			wc := conn.GetWebConn()
@@ -45,8 +48,7 @@ func (c *Comms) SendPutMessage(host *connect.Host, message *pb.GatewaySlot,
 		}
 
 		if err != nil {
-			err = errors.New(err.Error())
-			return nil, errors.New(err.Error())
+			return nil, err
 		}
 		return ptypes.MarshalAny(resultMsg)
 	}
@@ -74,7 +76,7 @@ func (c *Comms) SendPutManyMessages(host *connect.Host,
 		defer cancel()
 
 		// Send the message
-		var resultMsg *pb.GatewaySlotResponse
+		var resultMsg = &pb.GatewaySlotResponse{}
 		var err error
 		if conn.IsWeb() {
 			wc := conn.GetWebConn()
@@ -85,8 +87,7 @@ func (c *Comms) SendPutManyMessages(host *connect.Host,
 				PutManyMessages(ctx, messages)
 		}
 		if err != nil {
-			err = errors.New(err.Error())
-			return nil, errors.New(err.Error())
+			return nil, err
 		}
 		return ptypes.MarshalAny(resultMsg)
 	}
@@ -114,7 +115,7 @@ func (c *Comms) SendRequestClientKeyMessage(host *connect.Host,
 		defer cancel()
 
 		// Send the message
-		var resultMsg *pb.SignedKeyResponse
+		var resultMsg = &pb.SignedKeyResponse{}
 		var err error
 		if conn.IsWeb() {
 			wc := conn.GetWebConn()
@@ -127,7 +128,7 @@ func (c *Comms) SendRequestClientKeyMessage(host *connect.Host,
 
 		// Make sure there are no errors with sending the message
 		if err != nil {
-			return nil, errors.New(err.Error())
+			return nil, err
 		}
 		return ptypes.MarshalAny(resultMsg)
 	}
@@ -157,8 +158,8 @@ func (c *Comms) SendPoll(host *connect.Host,
 		// Send the message
 		if conn.IsWeb() {
 			wc := conn.GetWebConn()
-			clientStream, err := wc.NewClientStream(
-				&grpc.StreamDesc{ClientStreams: true},
+			clientStream, err := wc.NewServerStream(
+				&grpc.StreamDesc{ServerStreams: true},
 				"/mixmessages.Gateway/Poll")
 			if err != nil {
 				return nil, err
@@ -172,7 +173,7 @@ func (c *Comms) SendPoll(host *connect.Host,
 			clientStream, err := pb.NewGatewayClient(conn.GetGrpcConn()).
 				Poll(ctx, message)
 			if err != nil {
-				return nil, errors.New(err.Error())
+				return nil, err
 			}
 			return clientStream, nil
 		}
@@ -197,8 +198,7 @@ func (c *Comms) SendPoll(host *connect.Host,
 	if err != nil {
 		closeErr = stream.RecvMsg(nil)
 		return nil, wrapError(closeErr, "Could not "+
-			"receive streaming header from %s: %s", host.GetId(),
-			err.Error())
+			"receive streaming header from %s: %s", host.GetId(), err)
 	}
 
 	// Check if metadata has the expected header
@@ -251,7 +251,7 @@ func (c *Comms) RequestHistoricalRounds(host *connect.Host,
 		defer cancel()
 
 		// Send the message
-		var resultMsg *pb.HistoricalRoundsResponse
+		var resultMsg = &pb.HistoricalRoundsResponse{}
 		var err error
 		if conn.IsWeb() {
 			wc := conn.GetWebConn()
@@ -262,7 +262,7 @@ func (c *Comms) RequestHistoricalRounds(host *connect.Host,
 				RequestHistoricalRounds(ctx, message)
 		}
 		if err != nil {
-			return nil, errors.New(err.Error())
+			return nil, err
 		}
 		return ptypes.MarshalAny(resultMsg)
 	}
@@ -288,7 +288,7 @@ func (c *Comms) RequestMessages(host *connect.Host,
 		ctx, cancel := host.GetMessagingContext()
 		defer cancel()
 
-		var resultMsg *pb.GetMessagesResponse
+		var resultMsg = &pb.GetMessagesResponse{}
 		var err error
 		// Send the message
 		if conn.IsWeb() {
@@ -300,7 +300,7 @@ func (c *Comms) RequestMessages(host *connect.Host,
 				RequestMessages(ctx, message)
 		}
 		if err != nil {
-			return nil, errors.New(err.Error())
+			return nil, err
 		}
 		return ptypes.MarshalAny(resultMsg)
 	}

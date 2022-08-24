@@ -35,7 +35,7 @@ func (c *Comms) SendRegistrationMessage(host *connect.Host,
 		defer cancel()
 
 		// Send the message
-		var resultMsg *pb.SignedClientRegistrationConfirmations
+		var resultMsg = &pb.SignedClientRegistrationConfirmations{}
 		var err error
 		if conn.IsWeb() {
 			wc := conn.GetWebConn()
@@ -46,7 +46,7 @@ func (c *Comms) SendRegistrationMessage(host *connect.Host,
 				RegisterUser(ctx, message)
 		}
 		if err != nil {
-			return nil, errors.New(err.Error())
+			return nil, err
 		}
 		return ptypes.MarshalAny(resultMsg)
 	}
@@ -75,18 +75,10 @@ func (c *Comms) RequestNdf(host *connect.Host,
 		defer cancel()
 
 		// Send the message
-		var resultMsg *pb.NDF
-		var err error
-		if conn.IsWeb() {
-			wc := conn.GetWebConn()
-			err = wc.Invoke(
-				ctx, "/mixmessages.Registration/PollNdf", message, resultMsg)
-		} else {
-			resultMsg, err = pb.NewRegistrationClient(conn.GetGrpcConn()).
-				PollNdf(ctx, message)
-		}
+		resultMsg, err := pb.NewRegistrationClient(conn.GetGrpcConn()).
+			PollNdf(ctx, message)
 		if err != nil {
-			return nil, errors.New(err.Error())
+			return nil, err
 		}
 		return ptypes.MarshalAny(resultMsg)
 	}
