@@ -63,8 +63,9 @@ func (c *Comms) SendRegistrationMessage(host *connect.Host,
 	return result, ptypes.UnmarshalAny(resultMsg, result)
 }
 
-// RequestNdf is used to Request an ndf from permissioning
-// Used by gateway, client, nodes and gateways
+// RequestNdf is used to get an NDF from permissioning. It is only used by UDB
+// when starting or by client in testing. Other than those two uses, this
+// function should never be used as clients.
 func (c *Comms) RequestNdf(host *connect.Host,
 	message *pb.NDFHash) (*pb.NDF, error) {
 
